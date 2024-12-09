@@ -33,7 +33,7 @@ calc			@ function body
 Branch with Link branches to a PC-relative offset, setting register X30 to PC+4 with hint that this is a subroutine call
 
 
-[NEXT -> memory](memory.md)
+[NEXT -> memory](6_memory.md)
 
 <div align="center">
   <img src="../img/argo-mascot.jpg" alt="Logo">

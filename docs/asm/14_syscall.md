@@ -71,7 +71,8 @@ cmd:
 ```
 
 ### Check for syscall errors
-```
+
+```arm
 // linux sysCall to yield to another thread on the same core voluntarily
 thread_yield:
     INIT_FRAME
@@ -80,9 +81,9 @@ thread_yield:
     cmn     x0, #4095           // check if return value indicates error
     b.hi    error_handler       // if so branch
     RESTORE_STACK
-````
+```
 
-[NEXT -> network](network.md)
+[NEXT -> network](15_network.md)
 
 <div align="center">
   <img src="../img/argo-mascot.jpg" alt="Logo">
@@ -91,3 +92,4 @@ thread_yield:
     <img src="https://raw.githubusercontent.com/bornmay/bornmay/Update/svg/Bottom.svg" alt="Github Stats" />
 </p>
 <p align="right">(<a href="#top">back to top</a>)</p>
+

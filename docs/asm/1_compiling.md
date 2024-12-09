@@ -11,7 +11,7 @@ Below should work for most processors with fpu and NEON support
 as -mfpu=neon-vfpv4 -o main.o main.asm
 ```
 
-[NEXT -> linking](linking.md)
+[NEXT -> linking](2_linking.md)
 
 <div align="center">
   <img src="../img/argo-mascot.jpg" alt="Logo">

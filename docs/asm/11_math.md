@@ -417,7 +417,7 @@ We want to avoid back-to-back instructions where one instruction depends on the 
 ```
 It is beneficial to help hardware scheduler by organizing code to minimize obvious dependencies, especially around high-latency instructions such as multiply, divide, or memory ops.
 
-[NEXT -> syscalls](syscall.md)
+[NEXT -> strings](12_strings.md)
 
 <div align="center">
   <img src="../img/argo-mascot.jpg" alt="Logo">

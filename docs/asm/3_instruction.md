@@ -247,7 +247,7 @@ Understanding these characteristics can help in writing efficient code, especial
 
 [arGO instruction list](internal/instruction.go)
 
-[NEXT -> functions](function.md)
+[NEXT -> functions](4_function.md)
 
 <div align="center">
   <img src="../img/argo-mascot.jpg" alt="Logo">

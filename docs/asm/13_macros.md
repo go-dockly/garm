@@ -32,3 +32,13 @@ TERNARY w0, #0, w1, w2    // w0 = (w0 == 0) ? w1 : w2
 TERNARY w0, w1, w2, w3    // w0 = (w0 == w1) ? w2 : w3
 ```
 Much cleaner! The first parameter acts as the value being tested and the destination for result, just like a typical ternary expression.
+
+[NEXT -> syscalls](14_syscall.md)
+
+<div align="center">
+  <img src="../img/argo-mascot.jpg" alt="Logo">
+</div>
+<p align="center">
+    <img src="https://raw.githubusercontent.com/bornmay/bornmay/Update/svg/Bottom.svg" alt="Github Stats" />
+</p>
+<p align="right">(<a href="#top">back to top</a>)</p>

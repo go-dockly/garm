@@ -86,7 +86,7 @@ removed:
 	...
 ```
 
-[NEXT -> loops](loop.md)
+[NEXT -> loops](10_loop.md)
 
 <div align="center">
 	<img src="../img/argo-mascot.jpg" alt="Logo">

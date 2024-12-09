@@ -317,7 +317,7 @@ multi_acc_loop:
 ```
 expands to 12 sets of these three instructions, effectively unrolling the AES encryption rounds at compile time.
 
-[NEXT -> math](math.md)
+[NEXT -> math](11_math.md)
 
 <div align="center">
     <img src="../img/argo-mascot.jpg" alt="Logo">

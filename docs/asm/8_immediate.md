@@ -86,7 +86,7 @@ fn2:
     ret
 ```
 
-[NEXT -> conditionals](conditional.md)
+[NEXT -> conditionals](9_conditional.md)
 
 <div align="center">
 	<img src="../img/argo-mascot.jpg" alt="Logo">

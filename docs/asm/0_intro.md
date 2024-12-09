@@ -6,35 +6,39 @@
 
 [Princeton - Lecture](https://www.cs.princeton.edu/courses/archive/spr19/cos217/lectures/13_Assembly1.pdf)
 
-[Chapter 1 -> compiling](compiling.md)
+[Chapter 1 -> compiling](1_compiling.md)
 
-[Chapter 2 -> linking](linking.md)
+[Chapter 2 -> linking](2_linking.md)
 
-[Chapter 3 -> instructions](instruction.md)
+[Chapter 3 -> instructions](3_instruction.md)
 
-[Chapter 4 -> functions](function.md)
+[Chapter 4 -> functions](4_function.md)
 
-[Chapter 5 -> branching](branch.md)
+[Chapter 5 -> branching](5_branch.md)
 
-[Chapter 6 -> memory](memory.md)
+[Chapter 6 -> memory](6_memory.md)
 
-[Chapter 7 -> registers](register.md)
+[Chapter 7 -> registers](7_register.md)
 
-[Chapter 8 -> immediates](immediate.md)
+[Chapter 8 -> immediates](8_immediate.md)
 
-[Chapter 9 -> conditionals](conditional.md)
+[Chapter 9 -> conditionals](9_conditional.md)
 
-[Chapter 10 -> loops](loop.md)
+[Chapter 10 -> loops](10_loop.md)
 
-[Chapter 11 -> math](math.md)
+[Chapter 11 -> math](11_math.md)
 
-[Chapter 12 -> syscalls](syscall.md)
+[Chapter 12 -> strings](12_strings.md)
 
-[Chapter 13 -> network](network.md)
+[Chapter 13 -> macros](13_macros.md)
 
-[Chapter 14 -> crypto](crypto.md)
+[Chapter 14 -> syscalls](14_syscall.md)
 
-[Chapter 15 -> concurrency](concurrency.md)
+[Chapter 15 -> network](15_network.md)
+
+[Chapter 16 -> concurrency](16_concurrency.md)
+
+[Chapter 17 -> crypto](17_tips.md)
 
 
 <div align="center">

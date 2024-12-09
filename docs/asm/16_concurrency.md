@@ -221,3 +221,13 @@ Interrupt Handling:
 Power Consumption:
 
 - WFE is more efficient than spinning but don't WFE in critical timing sections
+
+[NEXT -> Tips & Tricks](17_tips.md)
+
+<div align="center">
+  <img src="../img/argo-mascot.jpg" alt="Logo">
+</div>
+<p align="center">
+    <img src="https://raw.githubusercontent.com/bornmay/bornmay/Update/svg/Bottom.svg" alt="Github Stats" />
+</p>
+<p align="right">(<a href="#top">back to top</a>)</p>

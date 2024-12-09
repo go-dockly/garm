@@ -572,7 +572,7 @@ ldp x29, x30, [sp], #16
 ret
 ```
 
-[NEXT -> immediates](immediate.md)
+[NEXT -> immediates](8_immediate.md)
 
 <div align="center">
     <img src="../img/argo-mascot.jpg" alt="Logo">

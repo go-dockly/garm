@@ -65,7 +65,7 @@ $ as -o build/main.o main.asm
 $ ld -o program build/main.o build/upper.o
 ```
 
-[NEXT -> instructions](instruction.md)
+[NEXT -> instructions](3_instruction.md)
 
 <div align="center">
   <img src="../img/argo-mascot.jpg" alt="Logo">

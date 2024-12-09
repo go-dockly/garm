@@ -57,3 +57,13 @@ simd_strlen:
     sub     x0, x0, x2             // Calculate length
     ret
 ```
+
+[NEXT -> macros](13_macros.md)
+
+<div align="center">
+  <img src="../img/argo-mascot.jpg" alt="Logo">
+</div>
+<p align="center">
+    <img src="https://raw.githubusercontent.com/bornmay/bornmay/Update/svg/Bottom.svg" alt="Github Stats" />
+</p>
+<p align="right">(<a href="#top">back to top</a>)</p>

@@ -205,7 +205,7 @@ Then if we need to load a 32-bit immediate value, we do the following
 ```
 [src: AS Compiler walk through](https://modexp.wordpress.com/2018/10/30/arm64-assembly/)
 
-[NEXT -> registers](register.md)
+[NEXT -> registers](7_register.md)
 
 <div align="center">
   <img src="../img/argo-mascot.jpg" alt="Logo">
