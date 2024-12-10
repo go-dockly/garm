@@ -1,71 +1,72 @@
 
-### Arithmetic
+## Arithmetic
 
-x0 == -1?
+### x0 == -1?
 ```asm
   cmn     x0, 1
   beq     minus_one
 ```
 
-x0 == 0
+### x0 == 0
 ```asm
   cmp     x0, 0
   beq     zero
+```
 
-allocate 32 bytes of stack
+### allocate 32 bytes of stack
 ```asm
   sub     sp, sp, 32
 ```
 
-x0 = x0 % 37
+### x0 = x0 % 37
 ```asm
   mov     x1, 37
   udiv    x2, x0, x1
   msub    x0, x2, x1, x0
 ```
 
-x0 = 0
+### x0 = 0
 ```asm
   sub     x0, x0, x0
 ```
 
-### Logical
+## Logical
 
 Multiplication can be performed using logical shift left LSL. Division can be performed using logical shift right LSR. Modulo operations can be performed using bitwise AND. The only condition is that the multiplier and divisor be a power of two. The first three examples shown here demonstrate those operations.
 
-x1 = x0 / 8
+### x1 = x0 / 8
 ```asm
   lsr     x1, x0, 3
 ```
 
-x1 = x0 * 4
+### x1 = x0 * 4
 ```asm
   lsl     x1, x0, 2
 ```
 
-x1 = x0 % 16
+### x1 = x0 % 16
 ```asm
   and     x1, x0, 15
 ```
 
-x0 == 0?
+### x0 == 0?
 ```asm
   tst     x0, x0
   beq     zero
 ```
 
-x0 = 0
+### x0 = 0
 ```asm
   eor     x0, x0, x0
 ```
 
-### Bit Manipulation
+## Bit Manipulation
 ARM64 provides several instructions for bit manipulation:
 - CLZ - Count Leading Zeros
 - CTZ/RBIT+CLZ - Count Trailing Zeros
 - CLS - Count Leading Sign bits
 
-1. Find highest set bit (equivalent to BSR)
+### Find highest set bit (equivalent to BSR)
 ```asm
 find_highest_set_bit:
     // Input in x0, result in x0
@@ -75,7 +76,7 @@ find_highest_set_bit:
     // x0 now contains the position of highest set bit (0-63)
     ret
 ```
-2. Find highest power of 2 less than or equal to input
+### Find highest power of 2 less than or equal to input
 ```asm
 highest_power_of_2:
     // Input in x0, result in x0
@@ -86,7 +87,7 @@ highest_power_of_2:
     lsl     x0, x0, x1          // Shift to create power of 2
     ret
 ```
-3. Round up to next power of 2
+### Round up to next power of 2
 ```asm
 round_up_power_2:
     // Input in x0, result in x0
@@ -99,7 +100,7 @@ round_up_power_2:
     lsl     x0, x0, x2          // Shift to create power of 2
     ret
 ```
-4. Check if number is power of 2
+### Check if number is power of 2
 ```asm
 is_power_of_2:
     // Input in x0, result in x0 (1 if power of 2, 0 if not)
@@ -109,7 +110,7 @@ is_power_of_2:
     cset    x0, eq              // Set result based on comparison
     ret
 ```
-5. Find nearest power of 2 (rounding to nearest)
+### Find nearest power of 2 (rounding to nearest)
 ```asm
 nearest_power_of_2:
     // Input in x0, result in x0
@@ -127,7 +128,7 @@ nearest_power_of_2:
     csel    x0, x3, x4, gt      // Select closer power
     ret
 ```
-6. Efficient byte reverse using bit scanning
+### Efficient byte reverse using bit scanning
 ```asm
 byte_reverse:
     // Input in x0, result in x0
@@ -135,7 +136,7 @@ byte_reverse:
     lsr     x0, x0, #56         // Shift right to align byte
     ret
 ```
-7. Find log base 2 of a number (floor)
+### Find log base 2 of a number (floor)
 ```asm
 log2_floor:
     // Input in x0, result in x0
@@ -317,53 +318,55 @@ Technique works well because:
 - Multiplication is typically 3-4 cycles
 - Division can be 12+ cycles
 
-### Lanes
+## Lanes
 NEON cannot do 128-bit math. The reason it has space this large is because you can put data into “lanes” in order to do parallel processing.
 
 A 128-bit register can have:
-```
+```bash
 16 8-bit lanes
 8 16-bit lanes
 4 32-bit lanes
 2 64-bit lanes
 ```
 
-Native 64-bit Operations in ARM64
-
+### Native 64-bit Operations in ARM64
+For 64-bit addition
 ```asm
-// For 64-bit addition
 ldr x0, [x1]        // Load 64-bit value
 ldr x2, [x3]        // Load another 64-bit value
 add x4, x0, x2      // 64-bit addition in one instruction
+```
 
-// For 128-bit addition (similar to ADC usage in x86)
+For 128-bit addition (similar to ADC usage in x86)
+```asm
 ldp x0, x1, [x2]    // Load 128-bit value (low, high)
 ldp x3, x4, [x5]    // Load second 128-bit value
 adds x6, x0, x3     // Add low 64 bits, set carry
 adc  x7, x1, x4     // Add high 64 bits with carry
 ```
 
-Using SIMD/NEON (equivalent to MMX approach)
-
+### Using SIMD/NEON (equivalent to MMX approach)
+Using SIMD for large integer operations
 ```asm
-// Using SIMD for large integer operations
 ld1 {v0.2d}, [x0]   // Load 128 bits into vector register
 ld1 {v1.2d}, [x1]   // Load another 128 bits
 add v2.2d, v0.2d, v1.2d  // Add as 2x64-bit integers
+```
 
-// For larger numbers (256-bit example)
+For larger numbers (256-bit example)
+```asm
 ld1 {v0.2d-v1.2d}, [x0]  // Load 256 bits
 ld1 {v2.2d-v3.2d}, [x1]  // Load another 256 bits
 add v4.2d, v0.2d, v2.2d  // Add low 128 bits
 add v5.2d, v1.2d, v3.2d  // Add high 128 bits
 ```
-NEON (ARM's SIMD) is more powerful than MMX
+
+## NEON (ARM's SIMD) is more powerful than MMX
 
 
-Optimized Multiple-Precision Arithmetic
-
+### Optimized Multiple-Precision Arithmetic
+Adding large numbers (e.g., 256-bit)
 ```asm
-// Adding large numbers (e.g., 256-bit)
 ldp x0, x1, [x10]      // Load first 128 bits
 ldp x2, x3, [x10, #16] // Load second 128 bits
 ldp x4, x5, [x11]      // Load third 128 bits
@@ -375,13 +378,12 @@ adcs x2, x2, x6        // Add with carry
 adc  x3, x3, x7        // Add final bits with carry
 ```
 
-Modern optimization tips for ARM64:
+### Modern optimization tips for ARM64:
+Prefer paired loads/stores for better memory access
 ```asm
-// Prefer paired loads/stores for better memory access
 ldp x0, x1, [x2]       // Load pair
 stp x0, x1, [x2]       // Store pair
 
-// Use NEON for bulk operations
 ld1 {v0.4s}, [x0]      // Load 128 bits
 add v1.4s, v0.4s, v2.4s // Parallel add
 

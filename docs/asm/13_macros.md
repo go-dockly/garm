@@ -55,7 +55,7 @@ cmp w0, #0
 csel w0, w1, w2, eq       // w0 = (w0 == 0) ? w1 : w2
 ```
 
-and turn it into a macro
+turn it into a macro
 
 ```asm
 .macro SELECT_IF_ZERO dst, test, true_val, false_val

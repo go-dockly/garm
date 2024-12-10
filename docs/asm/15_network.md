@@ -1,21 +1,7 @@
 
 ## Network
 
-[libsocket](https://github.com/dermesser/libsocket)
-
-connect remotely
-```bash
-    $ netcat 192.168.56.101 31337
-    ...
-    accept(3, 0, NULL)                      = 4
-    dup2(4, 0)                              = 0
-    dup2(4, 1)                              = 1
-    dup2(4, 2)                              = 2
-    execve("/bin//sh", [0], [/* 0 vars */]) = 0
-    ...
-    cat /etc/passwd 
-    root:x:0:0:root:/root:/bin/bash
-```
+Let's go over an example using [libsocket](https://github.com/dermesser/libsocket)
 
 ### Listen for Incoming Connections
 ```asm
@@ -333,28 +319,28 @@ A64 provides a conditional branch opcode that allows us to execute the IF statem
     tbnz    x0, 31, cls_efd
 ```
 
-After this check, we then need to determine if the signal was the result of input. We are only monitoring for input to a read end of pipe and socket. Every other event would indicate an error.
-The value of EPOLLIN is 1, and we only want those type of events. By masking the value of events with 1 using a bitwise AND, if the result is zero, then the peer has disconnected. Load pair is used to load both the events and data_fd values simultaneously
+After this check, we then need to determine if the signal was the result of input. 
+We are only monitoring for input to a read end of pipe and socket. Every other event would indicate an error.
+The value of EPOLLIN is 1, and we only want those type of events. 
+By masking the value of events with 1 using a bitwise AND, if the result is zero, then the peer has disconnected. 
+Load pair is used to load both the events and data_fd values simultaneously
 
-x0 = evts.events, x1 = evts.data.fd
+#### `x0 = evts.events, x1 = evts.data.fd`
 ```asm
     ldp     x0, x1, [sp, evts]
 ```
 
-if (!(evts.events & EPOLLIN)) break;
+#### `if (!(evts.events & EPOLLIN)) break;`
 ```asm
     tbz     w0, 0, cls_efd
 ```
-
 Our code will read from either out[0] or s
 
-assign socket or read end of output
-```asm
+```c
+  // assign socket or read end of output
   r = (fd == s) ? s     : out[0];
-```
 
-assign socket or write end of input
-```asm
+  // assign socket or write end of input
   w = (fd == s) ? in[1] : s;
 ```
 
@@ -384,7 +370,7 @@ Using the highly useful conditional select instruction, we can select the correc
     csel    w3, w5, w3, eq
 ```
 
-[src Socket Programming in Assembly](https://ansonliu.com/si485-site/lec/15/lec.html)
+src: [Socket Programming in Assembly](https://ansonliu.com/si485-site/lec/15/lec.html)
 
 [NEXT -> Concurrency](16_concurrency.md)
 

@@ -8,9 +8,9 @@ If the first condition evaulates to true (c equals zero), only then is the secon
     CMP    x, y
     B.NE   false
 true:
-    @ body of if statement
+    // body of if statement
 false:
-    @ end of if statement
+    // end of if statement
 ```
 armv7+
 ```asm
@@ -24,7 +24,7 @@ armv8+
     ccmp   x, y, 0, eq
     b.ne    false
 
-    @ conditions are true:
+    // conditions are true:
 false:
 ```
 Ternary operator
@@ -45,9 +45,9 @@ the branch becomes false and the loop terminates
 
 sequence of several conditional instructions
 ```asm
-	CMP    X0, #5   @ if (a == 5)
+	CMP    X0, #5   // if (a == 5)
 	MOV.EQ X0, #10  @
-	BL.EQ  fn       @   fn(10)
+	BL.EQ  fn       //   fn(10)
 ```
 Assume a is in X0. Compare X0 to 5. The next two instructions will be
 executed only if the compare returns EQual. They move 10 into X0, then call

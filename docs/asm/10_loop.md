@@ -1,4 +1,4 @@
-### Loops
+## Loops
 
 ```asm
 .text            
@@ -99,184 +99,187 @@ for i := 1; i < 4; i++ {
 }
 ```
 
-`for(i=0; i<=10; i++)` increment and check condition before every loop
+### `for(i=0; i<=10; i++)` increment and check condition before every loop
 ```asm
-        MOV     r0, #0      @ i
-        MOV     r1, #0      @ total
-for     CMP     r0, #10
-        BGE     fordone     @ first branch
-        ADD     r1, r1, r0
-        ADD     r0, r0, #1
-        B       for         @ second branch
+        MOV     X0, #0      // i
+        MOV     X1, #0      // total
+for     CMP     X0, #10
+        BGE     fordone     // first branch
+        ADD     X1, X1, X0
+        ADD     X0, X0, #1
+        B       for         // second branch
 fordone
 ```
-`for(i=10; i>0; i--)` decrement with using only one branch at the end`
+### `for(i=10; i>0; i--)` decrement with using only one branch at the end`
 ```asm
-        MOV     r0, #10     @ i
-        MOV     r1, #0      @ total
-ford    ADD     r1, r1, r0  
-        SUBS    r0, r0, #1
-        BNE     ford        @ first branch
+        MOV     X0, #10     // i
+        MOV     X1, #0      // total
+ford    ADD     X1, X1, X0  
+        SUBS    X0, X0, #1
+        BNE     ford        // first branch
 forddone
 ```
-`while(i>0)` initial branch only run once
+### `while(i>0)` initial branch only run once
 ```asm
-        MOV     r0, #10     @ i
-        MOV     r1, #0      @ total
-        B       wtest       @ initial branch
-while   ADD     r1, r1, r0
-        SUB     r0, r0, #1
-wtest   CMP     r0, #0
-        BGE     while       @ first branch
+        MOV     X0, #10     // i
+        MOV     X1, #0      // total
+        B       wtest       // initial branch
+while   ADD     X1, X1, X0
+        SUB     X0, X0, #1
+wtest   CMP     X0, #0
+        B.GE    while       // first branch
 ```
 
- `do..while(i>0)` same as while but without initial branch
+### `do..while(i>0)` same as while but without initial branch
  
 ```asm
-        MOV     r0, #10     @ i
-        MOV     r1, #0      @ total
-dwhile  ADD     r1, r1, r0
-        SUB     r0, r0, #1
-dwtest  CMP     r0, #0
-        BGE     while       @ first branch
+        MOV     X0, #10     // i
+        MOV     X1, #0      // total
+dwhile  ADD     X1, X1, X0
+        SUB     X0, X0, #1
+dwtest  CMP     X0, #0
+        B.GE    while       // first branch
         
         END
 ```
 
-### NEON 
+## NEON 
 
 process 4 elements per iteration
 ```asm
 basic_loop:
-        VLD1.32     {Q0}, [R0]!           @ Load 4 elements from array a
-        VLD1.32     {Q1}, [R1]!           @ Load 4 elements from array b
-        VADD.I32    Q0, Q0, Q1            @ Add vectors
-        VST1.32     {Q0}, [R2]!           @ Store result
-        SUBS        R4, R4, #4            @ Decrement counter
-        BGE         basic_loop
+    LD1     {V0.4S}, [X0], #16      // Load 4 elements from array a
+    LD1     {V1.4S}, [X1], #16      // Load 4 elements from array b
+    ADD     V0.4S, V0.4S, V1.4S     // Add vectors
+    ST1     {V0.4S}, [X2], #16      // Store result
+    
+    SUBS    X4, X4, #4              // Decrement counter
+    B.GE    basic_loop              // Branch if greater or equal
 ```
 
 ### Unrolled 2x 
 process 8 elements per iteration
 ```asm
 unrolled_2x_loop:
-        @ Load 8 elements (2 quad words) from each array
-        VLD1.32     {Q0,Q1}, [R0]!        @ Load 8 elements from array a
-        VLD1.32     {Q2,Q3}, [R1]!        @ Load 8 elements from array b
-        
-        @ Perform addition
-        VADD.I32    Q0, Q0, Q2            @ Add first 4 elements
-        VADD.I32    Q1, Q1, Q3            @ Add second 4 elements
-        
-        @ Store results
-        VST1.32     {Q0,Q1}, [R2]!        @ Store 8 results
-        SUBS        R4, R4, #8            @ Decrement counter
-        BGE         unrolled_2x_loop
+    // Load 8 elements (2 quad words) from each array
+    LD1     {V0.4S, V1.4S}, [X0], #32    // Load 8 elements from array a
+    LD1     {V2.4S, V3.4S}, [X1], #32    // Load 8 elements from array b
+    
+    // Perform addition
+    ADD     V0.4S, V0.4S, V2.4S     // Add first 4 elements
+    ADD     V1.4S, V1.4S, V3.4S     // Add second 4 elements
+    
+    // Store results
+    ST1     {V0.4S, V1.4S}, [X2], #32    // Store 8 results
+    
+    SUBS    X4, X4, #8              // Decrement counter
+    B.GE    unrolled_2x_loop        // Branch if greater or equal
 ```
 
 ### Unrolled 4x with prefetch 
 process 16 elements per iteration
 ```asm
 unrolled_4x_loop:
-        @ Prefetch next iterations
-        PLD         [R0, #64]             @ Prefetch array a
-        PLD         [R1, #64]             @ Prefetch array b
-        
-        @ Load 16 elements (4 quad words) from each array
-        VLD1.32     {Q0,Q1}, [R0]!        @ Load first 8 elements from a
-        VLD1.32     {Q2,Q3}, [R0]!        @ Load second 8 elements from a
-        VLD1.32     {Q8,Q9}, [R1]!        @ Load first 8 elements from b
-        VLD1.32     {Q10,Q11}, [R1]!      @ Load second 8 elements from b
-        
-        @ Perform additions
-        VADD.I32    Q0, Q0, Q8            @ Add first 4 elements
-        VADD.I32    Q1, Q1, Q9            @ Add second 4 elements
-        VADD.I32    Q2, Q2, Q10           @ Add third 4 elements
-        VADD.I32    Q3, Q3, Q11           @ Add fourth 4 elements
-        
-        @ Store results
-        VST1.32     {Q0,Q1}, [R2]!        @ Store first 8 results
-        VST1.32     {Q2,Q3}, [R2]!        @ Store second 8 results
-        SUBS        R4, R4, #16           @ Decrement counter
-        BGE         unrolled_4x_loop
+    // Prefetch next iterations
+    PRFM    PLDL1KEEP, [X0, #64]     // Prefetch array a
+    PRFM    PLDL1KEEP, [X1, #64]     // Prefetch array b
+    
+    // Load 16 elements (4 quad words) from each array
+    LD1     {V0.4S, V1.4S}, [X0], #32    // Load first 8 elements from a
+    LD1     {V2.4S, V3.4S}, [X0], #32    // Load second 8 elements from a
+    LD1     {V8.4S, V9.4S}, [X1], #32    // Load first 8 elements from b
+    LD1     {V10.4S, V11.4S}, [X1], #32  // Load second 8 elements from b
+    
+    // Perform additions
+    ADD     V0.4S, V0.4S, V8.4S     // Add first 4 elements
+    ADD     V1.4S, V1.4S, V9.4S     // Add second 4 elements
+    ADD     V2.4S, V2.4S, V10.4S    // Add third 4 elements
+    ADD     V3.4S, V3.4S, V11.4S    // Add fourth 4 elements
+    
+    // Store results
+    ST1     {V0.4S, V1.4S}, [X2], #32    // Store first 8 results
+    ST1     {V2.4S, V3.4S}, [X2], #32    // Store second 8 results
+    
+    SUBS    X4, X4, #16             // Decrement counter
+    B.GE    unrolled_4x_loop        // Branch if greater or equal
 ```
 
 ### Interleaved loads/compute with dual accumulators
 ```asm
 interleaved_loop:
-        @ Load first set while processing previous data
-        VLD1.32     {Q0,Q1}, [R0]!        @ Load from array a
-        VADD.I32    Q8, Q4, Q6            @ Process previous data (first set)
-        VLD1.32     {Q2,Q3}, [R1]!        @ Load from array b
-        VADD.I32    Q9, Q5, Q7            @ Process previous data (second set)
-        
-        @ Store previous results while loading new data
-        VST1.32     {Q8,Q9}, [R2]!        @ Store previous results
-        VLD1.32     {Q4,Q5}, [R0]!        @ Load next set from array a
-        VLD1.32     {Q6,Q7}, [R1]!        @ Load next set from array b
-        
-        @ Continue with current data
-        VADD.I32    Q10, Q0, Q2           @ Process current data (first set)
-        VADD.I32    Q11, Q1, Q3           @ Process current data (second set)
-        VST1.32     {Q10,Q11}, [R2]!      @ Store current results
-        
-        SUBS        R4, R4, #16           @ Decrement counter
-        BGE         interleaved_loop
+    // Load first set while processing previous data
+    LD1     {V0.4S, V1.4S}, [X0], #32     // Load from array a
+    ADD     V8.4S, V4.4S, V6.4S           // Process previous data (first set)
+    LD1     {V2.4S, V3.4S}, [X1], #32     // Load from array b
+    ADD     V9.4S, V5.4S, V7.4S           // Process previous data (second set)
+    
+    // Store previous results while loading new data
+    ST1     {V8.4S, V9.4S}, [X2], #32     // Store previous results
+    LD1     {V4.4S, V5.4S}, [X0], #32     // Load next set from array a
+    LD1     {V6.4S, V7.4S}, [X1], #32     // Load next set from array b
+    
+    // Continue with current data
+    ADD     V10.4S, V0.4S, V2.4S          // Process current data (first set)
+    ADD     V11.4S, V1.4S, V3.4S          // Process current data (second set)
+    ST1     {V10.4S, V11.4S}, [X2], #32   // Store current results
+    
+    SUBS    X4, X4, #16                   // Decrement counter
+    B.GE    interleaved_loop              // Branch if greater or equal
 ```
 
-###  Pipelining
+##  Pipelining
 NOTE: Needs init and epilogue code
 ```asm
 pipelined_loop:
-        @ Load
-        VLD1.32     {Q0,Q1}, [R0]!        @ Load new data from array a
-        
-        @ Load + Process previous
-        VLD1.32     {Q2,Q3}, [R1]!        @ Load new data from array b
-        VADD.I32    Q8, Q4, Q6            @ Process previous iteration
-        
-        @ Process current + Store previous
-        VADD.I32    Q9, Q0, Q2            @ Process current data
-        VST1.32     {Q8}, [R2]!           @ Store previous result
-        
-        @ Update pipeline registers
-        VMOV        Q4, Q0                @ Move current to previous
-        VMOV        Q6, Q2                @ Move current to previous
-        
-        SUBS        R4, R4, #8            @ Decrement counter
-        BGE         pipelined_loop
+    // Load
+    LD1     {V0.4S, V1.4S}, [X0], #32     // Load new data from array a
+    
+    // Load + Process previous
+    LD1     {V2.4S, V3.4S}, [X1], #32     // Load new data from array b
+    ADD     V8.4S, V4.4S, V6.4S           // Process previous iteration
+    
+    // Process current + Store previous
+    ADD     V9.4S, V0.4S, V2.4S           // Process current data
+    ST1     {V8.4S}, [X2], #16            // Store previous result
+    
+    // Update pipeline registers
+    MOV     V4.16B, V0.16B                // Move current to previous
+    MOV     V6.16B, V2.16B                // Move current to previous
+    
+    SUBS    X4, X4, #8                    // Decrement counter
+    B.GE    pipelined_loop                // Branch if greater or equal
 ```
 
 ### Advanced SIMD with multiple accumulators and prefetch
 Concurrency optimized for high-end ARM processors with multiple NEON units
 ```asm
 multi_acc_loop:
-        @ Prefetch next cache lines
-        PLD         [R0, #128]            @ Prefetch array a
-        PLD         [R1, #128]            @ Prefetch array b
-        
-        @ Load first block while processing previous block
-        VLD1.32     {Q0,Q1}, [R0]!        @ Load block 1 from array a
-        VADD.I32    Q12, Q8, Q10          @ Process previous block 1
-        VLD1.32     {Q2,Q3}, [R1]!        @ Load block 1 from array b
-        VADD.I32    Q13, Q9, Q11          @ Process previous block 2
-        
-        @ Load second block while storing previous results
-        VLD1.32     {Q4,Q5}, [R0]!        @ Load block 2 from array a
-        VST1.32     {Q12,Q13}, [R2]!      @ Store previous results
-        VLD1.32     {Q6,Q7}, [R1]!        @ Load block 2 from array b
-        
-        @ Process current blocks
-        VADD.I32    Q8, Q0, Q2            @ Process current block 1
-        VADD.I32    Q9, Q1, Q3            @ Process current block 1
-        VADD.I32    Q10, Q4, Q6           @ Process current block 2
-        VADD.I32    Q11, Q5, Q7           @ Process current block 2
-        
-        @ Store current results
-        VST1.32     {Q8,Q9,Q10,Q11}, [R2]!  @ Store all current results
-        
-        SUBS        R4, R4, #32           @ Decrement counter
-        BGE         multi_acc_loop
+    // Prefetch next cache lines
+    PRFM    PLDL1KEEP, [X0, #128]     // Prefetch array a
+    PRFM    PLDL1KEEP, [X1, #128]     // Prefetch array b
+    
+    // Load first block while processing previous block
+    LD1     {V0.4S, V1.4S}, [X0], #32 // Load block 1 from array a
+    ADD     V12.4S, V8.4S, V10.4S     // Process previous block 1
+    LD1     {V2.4S, V3.4S}, [X1], #32 // Load block 1 from array b
+    ADD     V13.4S, V9.4S, V11.4S     // Process previous block 2
+    
+    // Load second block while storing previous results
+    LD1     {V4.4S, V5.4S}, [X0], #32 // Load block 2 from array a
+    ST1     {V12.4S, V13.4S}, [X2], #32 // Store previous results
+    LD1     {V6.4S, V7.4S}, [X1], #32 // Load block 2 from array b
+    
+    // Process current blocks
+    ADD     V8.4S, V0.4S, V2.4S       // Process current block 1
+    ADD     V9.4S, V1.4S, V3.4S       // Process current block 1
+    ADD     V10.4S, V4.4S, V6.4S      // Process current block 2
+    ADD     V11.4S, V5.4S, V7.4S      // Process current block 2
+    
+    // Store current results
+    ST1     {V8.4S, V9.4S, V10.4S, V11.4S}, [X2], #64 // Store all current results
+    
+    SUBS    X4, X4, #32               // Decrement counter
+    B.GE    multi_acc_loop            // Branch if greater or equal
 ```
 
 ### IRPC (repeat character)
@@ -295,9 +298,9 @@ multi_acc_loop:
 ```asm
 .irpc   x, 123
     // will expand to three separate blocks
-    mov r0, #&x   // First iteration: mov r0, #1
-                  // Second iteration: mov r0, #2
-                  // Third iteration: mov r0, #3
+    mov x0, #&x   // First iteration:  mov x0, #1
+                  // Second iteration: mov x0, #2
+                  // Third iteration:  mov x0, #3
 .endr
 ```
 

@@ -1,7 +1,10 @@
-## 
+## Linking
 
+
+Let's take the simple example: 
+
+#### upper.s
 ```asm
-// upper.s (ARM64 version)
 .global upper
 
 upper:
@@ -48,8 +51,8 @@ done:
     RET
 ```
 
+#### main.s
 ```asm
-// main.s (ARM64 version)
 .data
 input_str:  .asciz "Hello World!"    // Input string to convert
 output_str: .skip 100                // Buffer for output string

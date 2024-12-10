@@ -22,7 +22,6 @@ The main system instruction for shellcodes on linux is supervisor call (SVC)
 
 ```asm
  // 40 bytes
-
     .arch armv8-a
 
     .include "macro.inc"

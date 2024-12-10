@@ -335,20 +335,20 @@ This mode accesses the value first and then adds the offset to base.
 ### Saving Registers
 19 registers are free to use without having to preserve them for the caller. Compare to x86 where only 3 registers are available or 5 on AMD64. ARM stores the return address in the Link Register (LR) which is an alias for X30 register. A callee is expected to save LR/X30 if it calls a subroutine
 ```asm
-    @ push {x0}
-    @ [base - 16] = x0
-    @ base = base - 16
+    // push {x0}
+    // [base - 16] = x0
+    // base = base - 16
     str    x0, [sp, -16]!
 
-    @ pop {x0}
-    @ x0 = [base]
-    @ base = base + 16
+    // pop {x0}
+    // x0 = [base]
+    // base = base + 16
     ldr    x0, [sp], 16
 
-    @ push {x0, x1}
+    // push {x0, x1}
     stp    x0, x1, [sp, -16]!
 
-    @ pop {x0, x1}
+    // pop {x0, x1}
     ldp    x0, x1, [sp], 16
 ```
 The 16 in stp x29, x30, [sp, #-16]! is about stack space:
@@ -360,92 +360,92 @@ The 16 in stp x29, x30, [sp, #-16]! is about stack space:
 
 ### Copying Registers
 ```asm
-    @ Move x1 to x0
+    // Move x1 to x0
     mov     x0, x1
 
-    @ Extract bits 0-63 from x1 and store in x0 zero extended.
+    // Extract bits 0-63 from x1 and store in x0 zero extended.
     ubfx   x0, x1, 0, 63
 
-    @ x0 = (x1 & ~0)
+    // x0 = (x1 & ~0)
     bic    x0, x1, xzr
 
-    @ x0 = x1 >> 0
+    // x0 = x1 >> 0
     lsr    x0, x1, 0
 
-    @ Use a circular shift (rotate) to move x1 to x0
+    // Use a circular shift (rotate) to move x1 to x0
     ror    x0, x1, 0
     
-    @ Extract bits 0-63 from x1 and insert into x0
+    // Extract bits 0-63 from x1 and insert into x0
     bfxil  x0, x1, 0, 63
 ```
 ###  Init register to zero
 Initialize a counter “i = 0” or pass NULL/0 to a system call like so
 ```asm
-    @ Move an immediate value of zero into the register.
+    // Move an immediate value of zero into the register.
     mov    x0, 0
 
-    @ Copy the zero register.
+    // Copy the zero register.
     mov    x0, xzr
 
-    @ Exclusive-OR the register with itself.
+    // Exclusive-OR the register with itself.
     eor    x0, x0, x0
 
-    @ Subtract the register from itself.
+    // Subtract the register from itself.
     sub    x0, x0, x0
 
-    @ Mask the register with zero register using a bitwise AND.
-    @ An immediate value of zero will work here too.
+    // Mask the register with zero register using a bitwise AND.
+    // An immediate value of zero will work here too.
     and    x0, x0, xzr
 
-    @ Multiply the register by the zero register.
+    // Multiply the register by the zero register.
     mul    x0, x0, xzr
 
-    @ Extract 64 bits from xzr and place in x0.
+    // Extract 64 bits from xzr and place in x0.
     bfxil  x0, xzr, 0, 63
     
-    @ Circular shift (rotate) right.
+    // Circular shift (rotate) right.
     ror    x0, xzr, 0
 
-    @ Logical shift right.
+    // Logical shift right.
     lsr    x0, xzr, 0
     
-    @ Reverse bytes of zero register.
+    // Reverse bytes of zero register.
     rev    x0, xzr
 ```
 ### Init register to 1.
 Rarely starts a counter at 1, but it’s common enough
 ```asm
-    @ Move 1 into x0.
+    // Move 1 into x0.
     mov     x0, 1
 
-    @ Compare x0 with x0 and set x0 if equal.
+    // Compare x0 with x0 and set x0 if equal.
     cmp     x0, x0
     cset    x0, eq
 
-    @ Bitwise NOT the zero register and store in x0. Negate x0.
+    // Bitwise NOT the zero register and store in x0. Negate x0.
     mvn     x0, xzr
     neg     x0, x0
 ```
 ### Init register to -1.
 Some sys calls require this
 ```asm
-    @ move -1 into register
+    // move -1 into register
     mov     x0, -1
 
-    @ copy the zero register inverted
+    // copy the zero register inverted
     mvn     x0, xzr
 
-    @ x0 = ~(x0 ^ x0)
+    // x0 = ~(x0 ^ x0)
     eon     x0, x0, x0
 
-    @ x0 = (x0 | ~xzr)
+    // x0 = (x0 | ~xzr)
     orn     x0, x0, xzr
 
-    @ x0 = (int)0xFF
+    // x0 = (int)0xFF
     mov     w0, 255
     sxtb    x0, w0
 
-    @ x0 = (x0 == x0) ? -1 : x0
+    // x0 = (x0 == x0) ? -1 : x0
     cmp     x0, x0
     csetm   x0, eq
 ```
@@ -454,104 +454,104 @@ might seem vague, but crypto/X25519 uses this value for reduction step
 ```asm
     mov     w0, 0x80000000
 
-    @ Set bit 31 of w0.
+    // Set bit 31 of w0.
     mov     w0, 1
     mov     w0, w0, lsl 31
 
-    @ Set bit 31 of w0.
+    // Set bit 31 of w0.
     mov     w0, 1
     ror     w0, w0, 1
 
-    @ Set bit 31 of w0.
+    // Set bit 31 of w0.
     mov     w0, 1
     rbit    w0, w0
 
-    @ Set bit 31 of w0.
+    // Set bit 31 of w0.
     eon     w0, w0, w0
     lsr     w0, w0, 1
     add     w0, w0, 1
     
-    @ Set bit 31 of w0.
+    // Set bit 31 of w0.
     mov     w0, -1
     extr    w0, w0, wzr, 1
 ```
 ### Check for 1/TRUE.
 some ways to test for equality
 ```asm
-    @ Compare x0 with 1, branch if equal.
+    // Compare x0 with 1, branch if equal.
     cmp     x0, 1
     beq     true
 
-    @ Compare x0 with zero register, branch if not equal.
+    // Compare x0 with zero register, branch if not equal.
     cmp     x0, xzr
     bne     true
     
-    @ Subtract 1 from x0 and set flags. Branch if equal. (Z flag is set)
+    // Subtract 1 from x0 and set flags. Branch if equal. (Z flag is set)
     subs    x0, x0, 1
     beq     true
 
-    @ Negate x0 and set flags. Branch if x0 is negative.
+    // Negate x0 and set flags. Branch if x0 is negative.
     negs    x0, x0
     bmi     true
 
-    @ Conditional branch if x0 is not zero.
+    // Conditional branch if x0 is not zero.
     cbnz    x0, true
 
-    @ Test bit 0 and branch if not zero.
+    // Test bit 0 and branch if not zero.
     tbnz    x0, 0, true
 ```
 
 ### Check for 0/FALSE.
 ```asm
-    @ x0 == 0
+    // x0 == 0
     cmp     x0, 0
     beq     false
 
-    @ x0 == 0
+    // x0 == 0
     cmp     x0, xzr
     beq     false
 
     ands    x0, x0, x0
     beq     false
 
-    @ same as ANDS, but discards result
+    // same as ANDS, but discards result
     tst     x0, x0
     beq     false
 
-    @ x0 == -0
+    // x0 == -0
     negs    x0
     beq     false
 
-    @ (x0 - 1) == -1
+    // (x0 - 1) == -1
     subs    x0, x0, 1
     bmi     false
 
-    @ if (!x0) goto false
+    // if (!x0) goto false
     cbz     x0, false
 
-    @ if (!x0) goto false
+    // if (!x0) goto false
     tbz     x0, 0, false
 ```
 ### Check for -1
 Some functions will return a negative number like -1 to indicate failure. CMN is used in the first example. This behaves exactly like CMP, except it is adding the source value (register or immediate) to the destination register, setting the flags and discarding the result.
 ```asm
-    @ w0 == -1
+    // w0 == -1
     cmn     w0, 1
     beq     failed
 
-    @ w0 == 0
+    // w0 == 0
     cmn     w0, wzr
     bmi     failed
 
-    @ negative?
+    // negative?
     ands    w0, w0, w0
     bmi     failed
 
-    @ same as AND, but discards result
+    // same as AND, but discards result
     tst     w0, w0
     bmi     failed
 
-    @ w0 & 0x80000000
+    // w0 & 0x80000000
     tbz     w0, 31, failed
 ```
 ```asm
