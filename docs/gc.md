@@ -27,8 +27,7 @@
 - Scales well to large heaps
 - Very complex to implement in assembly
 
-## arGO彡
-`૮₍ • ᴥ • ₎ა` 
+## `૮₍ • ᴥ • ₎ა gARM彡` WIP coming soon
 
 ### Generational Garbage Collection (default)
 
@@ -43,7 +42,7 @@ Allocation:
 
 Objects are initially allocated in eden space
 
-```arm
+```asm
 ALLOC_STRING 32    // Allocate 32-byte string
 ALLOC_ARRAY 100, 4 // Allocate array of 100 integers
 ```
@@ -53,7 +52,7 @@ ALLOC_ARRAY 100, 4 // Allocate array of 100 integers
 
 Root registration:
 
-```arm
+```asm
 bl register_thread_roots  // Register current thread roots
 ```
 

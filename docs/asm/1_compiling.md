@@ -1,10 +1,5 @@
 ### Compiling
 
-<p align="center"> 
-  Visitor count<br>
-  <img src="https://profile-counter.glitch.me/sagar-viradiya/count.svg" />
-</p>
-
 We need to tell the assembler that we are expecting a processor that has extended features. 
 Below should work for most processors with fpu and NEON support
 ```bash

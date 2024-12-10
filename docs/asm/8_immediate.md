@@ -1,5 +1,5 @@
 ### Immediates
-```arm
+```asm
 .data
     number: .word 42    // integer constant
 
@@ -30,7 +30,7 @@ Creates a label called number
 ```
 Looking at the actual bytes in memory, 42 would be stored as:
 
-```arm
+```asm
 2A 00 00 00
 ```
 In arm64, memory addresses are 64-bit values. Typically loaded in two parts because:
@@ -38,7 +38,7 @@ In arm64, memory addresses are 64-bit values. Typically loaded in two parts beca
 - A single instruction can only hold a limited size immediate value
 - Programs use relative addressing for position-independent code (PIC)
 
-```arm
+```asm
 adrp    x0, number               // Loads upper bits (page address)
 add     x0, x0, :lo12:number     // Adds lower 12 bits offset
 ```
@@ -63,7 +63,7 @@ This instruction sequence is necessary because ARM can't load a full 64-bit addr
 
 Functions typically share the same .data and .text sections within a single assembly file. The sections are file-level (or program-level) constructs, not function-level.
 
-```arm
+```asm
 .data
     number1: .word 42    // Shared data section
     number2: .word 100

@@ -4,7 +4,7 @@ Functions in ARM assembly are similar to functions in high-level languages. They
 
 arguments are passed through registers (R0-R3) for integer values, and (S0-S7) for floating-point values. The return value is also passed through a register (R0 for integer values, and S0 for floating-point values).
 
-```arm
+```asm
 // Input: x0 = channel ptr, x1 = buffer size, w2 = direction
 // Output: x0 = channel ptr or NULL on failure
 // Clobbers: x3-x6
@@ -31,7 +31,7 @@ x2: Contains direction val
 The function returns channel pointer in x0, or NULL if it fails
 
 Function prologue:
-```arm
+```asm
 stp     x29, x30, [sp, #-48]!
 stp     x19, x20, [sp, #16]
 stp     x21, x22, [sp, #32]
@@ -49,7 +49,7 @@ x21 and x22 (preserved registers)
 Sets up x29 as the frame pointer pointing to the stack
 
 Matching epilogue at the end
-```arm
+```asm
 ldp     x21, x22, [sp, #32]
 ldp     x19, x20, [sp, #16]
 ldp     x29, x30, [sp], #48
@@ -67,19 +67,19 @@ Best Practices
 - Document your labels with comments
 - Keep a consistent naming convention
 - Consider using a prefix for different sections of code
-```arm
-@ Option 1: Use unique names
+```asm
+ // Option 1: Use unique names
 loop_outer:
     // ...
 loop_outer_done:
     // ...
 
-@ Option 2: Use local labels (starting with number or dot)
-.Loop:  @ Local label
+ // Option 2: Use local labels (starting with number or dot)
+.Loop:   // Local label
     // ...
     
-@ Option 3: .L\@ in the label names. The .L means local and the \@ is a special asm symbol that gets replaced with a unique number for each macro expansion. This ensures that each instance of the macro gets its own unique set of labels
-```arm
+ // Option 3: .L\ // in the label names. The .L means local and the \ // is a special asm symbol that gets replaced with a unique number for each macro expansion. This ensures that each instance of the macro gets its own unique set of labels
+```asm
 // First use
 .L123_oop:
     // ...
@@ -101,16 +101,16 @@ Valid Symbol Names:
 - Cannot contain dots/periods within the name
 
 Incorrect:
-```arm
-.global fmt.Println    @ Not allowed - contains dot
-.global .test          @ Not allowed - starts with dot
+```asm
+.global fmt.Println     // Not allowed - contains dot
+.global .test           // Not allowed - starts with dot
 ```
 
 Correct:
-```arm
-.global fmt_println   @ Valid - uses underscore
-.global FmtPrintln    @ Valid - camelCase
-.global FMT_PRINTLN   @ Valid - uppercase with underscore
+```asm
+.global fmt_println    // Valid - uses underscore
+.global FmtPrintln     // Valid - camelCase
+.global FMT_PRINTLN    // Valid - uppercase with underscore
 ```
 
 [NEXT -> branching](5_branch.md)

@@ -1,6 +1,6 @@
 ### Loops
 
-```arm
+```asm
 .text            
 .global _start
 
@@ -100,7 +100,7 @@ for i := 1; i < 4; i++ {
 ```
 
 `for(i=0; i<=10; i++)` increment and check condition before every loop
-```arm
+```asm
         MOV     r0, #0      @ i
         MOV     r1, #0      @ total
 for     CMP     r0, #10
@@ -111,7 +111,7 @@ for     CMP     r0, #10
 fordone
 ```
 `for(i=10; i>0; i--)` decrement with using only one branch at the end`
-```arm
+```asm
         MOV     r0, #10     @ i
         MOV     r1, #0      @ total
 ford    ADD     r1, r1, r0  
@@ -120,7 +120,7 @@ ford    ADD     r1, r1, r0
 forddone
 ```
 `while(i>0)` initial branch only run once
-```arm
+```asm
         MOV     r0, #10     @ i
         MOV     r1, #0      @ total
         B       wtest       @ initial branch
@@ -132,7 +132,7 @@ wtest   CMP     r0, #0
 
  `do..while(i>0)` same as while but without initial branch
  
-```arm
+```asm
         MOV     r0, #10     @ i
         MOV     r1, #0      @ total
 dwhile  ADD     r1, r1, r0
@@ -146,7 +146,7 @@ dwtest  CMP     r0, #0
 ### NEON 
 
 process 4 elements per iteration
-```arm
+```asm
 basic_loop:
         VLD1.32     {Q0}, [R0]!           @ Load 4 elements from array a
         VLD1.32     {Q1}, [R1]!           @ Load 4 elements from array b
@@ -158,7 +158,7 @@ basic_loop:
 
 ### Unrolled 2x 
 process 8 elements per iteration
-```arm
+```asm
 unrolled_2x_loop:
         @ Load 8 elements (2 quad words) from each array
         VLD1.32     {Q0,Q1}, [R0]!        @ Load 8 elements from array a
@@ -176,7 +176,7 @@ unrolled_2x_loop:
 
 ### Unrolled 4x with prefetch 
 process 16 elements per iteration
-```arm
+```asm
 unrolled_4x_loop:
         @ Prefetch next iterations
         PLD         [R0, #64]             @ Prefetch array a
@@ -202,7 +202,7 @@ unrolled_4x_loop:
 ```
 
 ### Interleaved loads/compute with dual accumulators
-```arm
+```asm
 interleaved_loop:
         @ Load first set while processing previous data
         VLD1.32     {Q0,Q1}, [R0]!        @ Load from array a
@@ -226,7 +226,7 @@ interleaved_loop:
 
 ###  Pipelining
 NOTE: Needs init and epilogue code
-```arm
+```asm
 pipelined_loop:
         @ Load
         VLD1.32     {Q0,Q1}, [R0]!        @ Load new data from array a
@@ -249,7 +249,7 @@ pipelined_loop:
 
 ### Advanced SIMD with multiple accumulators and prefetch
 Concurrency optimized for high-end ARM processors with multiple NEON units
-```arm
+```asm
 multi_acc_loop:
         @ Prefetch next cache lines
         PLD         [R0, #128]            @ Prefetch array a
@@ -303,7 +303,7 @@ multi_acc_loop:
 
 #### AES example
 
-```arm
+```asm
 .irpc   round, 123456789101112
     // Parallel SubBytes
     aese.8  v0.16b, v2.16b

@@ -3,32 +3,31 @@
 [Azeria on branching](https://azeria-labs.com/arm-conditional-execution-and-branching-part-6/)
 
 Branching forward, to skip over some code:
-```arm
+```asm
 	...
-	B fwd		@  jump to label 'fwd'
+	B fwd		 //  jump to label 'fwd'
 	...
 fwd
 ```
 B instruction to unconditionally branch to label at PC-relative offset, with hint that this is not a subroutine call or return
 
 Branching backwards, creating a loop:
-```arm
+```asm
 back
 	...		
-	B back		@ jump to label 'back'
+	B back		 // jump to label 'back'
 ```
 
 Using BL to call a subroutine: 
-```arm
+```asm
 	...
-	BL  calc	@ call 'calc'
+	BL  calc	 // call 'calc'
 	...
 
-calc			@ function body
-	ADD r0,r1,r2	@ do some work here
-	MOV pc, r14	@ PC = R14 to return
-
-	ENDs
+calc			 	// function body
+	ADD X0,X1,X2	// do some work here
+	MOV pc, X14	 	// PC = X14 to return
+	...
 ```
 Branch with Link branches to a PC-relative offset, setting register X30 to PC+4 with hint that this is a subroutine call
 

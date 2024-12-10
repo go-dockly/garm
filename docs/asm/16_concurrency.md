@@ -1,5 +1,5 @@
 
-## Concurrency
+# Concurrency
 
 minimal bare-metal assembly example that illustrates [what multicore assembly looks like](https://stackoverflow.com/questions/980999/what-does-multicore-assembly-language-look-like/33651438#33651438)
 
@@ -8,10 +8,10 @@ minimal bare-metal assembly example that illustrates [what multicore assembly lo
 - [Lock free programming](https://www.boost.org/doc/libs/1_63_0/doc/html/lockfree.html)
 - [futex](https://www.collabora.com/news-and-blog/blog/2022/02/08/landing-a-new-syscall-part-what-is-futex/)
 
-### Semaphores
+## Semaphores
 Semaphores are synchronization primitives used to control access to a common resource in concurrent programming.
 
-```arm
+```asm
 .macro CHAN_SIGNAL_SEMAPHORE sem_ptr
     mov     w1, #1
     str     w1, [\sem_ptr]         // Set semaphore
@@ -27,16 +27,16 @@ Semaphores are synchronization primitives used to control access to a common res
 ```
 CHAN_WAIT_SEMAPHORE takes argument, sem_ptr, expected to be a pointer to a semaphore. 
 
-`mov x0, \sem_ptr` 
+### `mov x0, \sem_ptr` 
 - `\` before sem_ptr is macro syntax to reference the argument passed to it.
 
-`mov x1, #0`
+### `mov x1, #0`
 - sets register x1 to 0 or false indicating non-blocking.
 
-`mov x8, #98`
+### `mov x8, #98`
 - 98 in Arm Linux means futex (Fast Userspace muTEX - kernel system call implementing locking and synchronization primitives)
 
-`svc #0`
+### `svc #0`
 - triggers a supervisor call, which switches the processor into supervisor mode to execute the sysCall in x8.
 
 Fast Path (CHAN_SIGNAL_SEMAPHORE):
@@ -51,7 +51,7 @@ Slow Path (CHAN_WAIT_SEMAPHORE):
 - Linux Kernel handles thread sleeping/waking through
 - futex syscall (fast userspace operations with kernel fallback) for waiting
 
-```arm
+```asm
 // Thread 1 - Waiter
 check_sem:
     ldr     w0, [sem_ptr]        // Check semaphore value
@@ -66,28 +66,27 @@ do_wait:
 CHAN_SIGNAL_SEMAPHORE sem_ptr    // Signal waiting thread
 ```
 
-### Wait For Event (WFE)
+## Wait For Event (WFE)
 conceptually equivalent to
 
 ```c
 while (!event_has_occurred) /*do nothing*/;
 ```
-
 except it turns the CPU off instead of running in a loop.
 
-Several things that can interrupt WFE
+Several things that can interrupt WFE:
 - explicit wake up event from another CPU
 - an interrupt 
 
-If an interrupt happens during WFE
+If an interrupt happens during WFE:
 - processor switches to IRQ or FIQ mode
 - jumps to the IRQ or FIQ handler
 - address of WFE instruction (plus offset) is placed in the link register
 - if the CPU is triggered by a WAKE_UP event
 - execution proceeds with the next instruction after WFE.
 
-ARM assembly WFE concept
-```arm
+### WFE concept
+```asm
 wait_loop:
     ldr     w0, [sem_ptr]        // Load current value
     cbnz    w0, exit_wait        // Exit if value is non-zero
@@ -97,7 +96,7 @@ exit_wait:
 ```
 handle wake-up scenarios and potential race conditions
 
-```arm
+```asm
 .macro WAIT_FOR_EVENT sem_ptr
     // Save state if needed
     stp     x29, x30, [sp, #-16]!
@@ -154,40 +153,40 @@ handle_interrupt:
 .endm
 ```
 
-Memory Ordering:
+### Memory Ordering:
 
-```arm
+```asm
 dmb     ish                  // Data Memory Barrier
 ```
 ensure memory operations complete in order
 to prevent race conditions between cores
 
 
-Atomic Operations:
-```arm
+### Atomic Operations:
+```asm
 ldaxr   w0, [\sem_ptr]       // Load-Exclusive
 stlxr   w2, w1, [\sem_ptr]   // Store-Exclusive
 ```
 use exclusive monitors for atomic operations
 
 
-Event Handling:
-```arm
+### Event Handling:
+```asm
 wfe                         // Wait For Event
 sev                         // Send Event
 ```
 WFE puts processor in low-power state
 SEV wakes up other processors
 
-Interrupt Awareness:
-```arm
+### Interrupt Awareness:
+```asm
 mrs     x1, DAIF            // Get interrupt status
 tst     x1, #(1 << 7)       // Check IRQ bit
 ```
 Check for interrupt occurrence handle IRQ/FIQ
 
-Usage example:
-```arm
+### Usage example:
+```asm
 // Initialize event
     mov     w0, #0
     str     w0, [event_ptr]
@@ -199,26 +198,26 @@ Usage example:
     SIGNAL_EVENT event_ptr
 ```
 
-### Common pitfalls
+## Common pitfalls
 
-Memory Barriers:
+### Memory Barriers:
 
 - always use appropriate DMB instructions to ensure visibility across cores
 
-Spurious Wake-ups:
+### Spurious Wake-ups:
 
 - always re-check condition after WFE don't assume wake means event occurred
 
-Race Conditions:
+### Race Conditions:
 
 - [Data Race Patterns in Go](https://www.uber.com/en-SE/blog/data-race-patterns-in-go/)
 - use exclusive operations for atomic access
 
-Interrupt Handling:
+### Interrupt Handling:
 
 - save state then return from interrupt
 
-Power Consumption:
+### Power Consumption:
 
 - WFE is more efficient than spinning but don't WFE in critical timing sections
 

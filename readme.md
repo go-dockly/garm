@@ -9,18 +9,12 @@
 `gARM彡` is a compiler for ARM64 assembly combining Go's simplicity with low-level control and high performance. Offering optimizations, hardware-level tuning, security controls, debugging tools, and more for the avid hacker.
 We love our gopher more than anything it's always been a loyal companion protecting and providing us.
 
-## Workspace `(。O ⩊ O。)っ`
-
-### vscode extensions
-- [ARM64 Instruction Reference](https://marketplace.visualstudio.com/items?itemName=whiteout2.arm64)
-- [ARM Assembly Editor support](https://marketplace.visualstudio.com/items?itemName=Mikhail-Arkhipov.armassemblyeditor)
-- [ARM Assembly syntax support](https://marketplace.visualstudio.com/items?itemName=dan-c-underwood.arm)
-- [ARM64 Snippets](https://marketplace.visualstudio.com/items?itemName=drewmrk.arm64-assembly-snippets)
-- [Hex Editor](https://marketplace.visualstudio.com/items?itemName=ms-vscode.hexeditor)
-
 ## Documentation `Σ(°△°)ꪱꪱ`
 
 𒇫 [ARM assembly 101/](docs/asm/0_intro.md)
+
+𒇫 [docs/](docs/docs.md)
+
 𒇫 [Links/](docs/links.md)
 
 ## `૮( OᴗO)っ` Philosophy

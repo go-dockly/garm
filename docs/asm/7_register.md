@@ -38,7 +38,7 @@ X0:  [63...............32][31................0]
 W0:                       [31................0]
 ```
 
-```arm
+```asm
 mov     x0, #0x1234567890ABCDEF    // 64-bit value
 mov     w0, #0x12345678            // Only affects lower 32 bits
                                    // Upper 32 bits are zeroed!
@@ -63,7 +63,7 @@ W0 after:   0x12345678            (same as lower 32 bits of X0)
 - Affects all 64 bits
 - Can access via W register for lower 32 bits
 
-```arm
+```asm
 // For byte operations (8-bit)
 ldrb    w0, [x1]        // Load a single byte into W0 (zeros upper bits)
 
@@ -91,7 +91,7 @@ mul     x0, x1, x2      // 64-bit multiplication
 - Handling 64-bit values
 - Working with pointers
 
-```arm
+```asm
 // Loading different sizes
 ldrb    w0, [x1]        // Load byte (8-bit)
 ldrh    w0, [x1]        // Load halfword (16-bit)
@@ -179,7 +179,7 @@ For generating efficient code with multiple function calls, we should use a regi
 
 Here's an example of the thinking process:
 
-```arm
+```asm
 // Example Go code:
 func main() {
     a := 1        // Short lived, goes directly to x0
@@ -274,7 +274,7 @@ This strategy minimizes:
 
 The key is tracking value lifetimes and using the appropriate register class (caller vs callee saved) based on whether values need to survive function calls.
 
-```arm
+```asm
 func:
     // Save FP/LR
     stp x29, x30, [sp, #-16]!
@@ -303,7 +303,7 @@ An offset is applied to an address from a base register and the result is used t
 #### Pre-indexed addressing 
 An offset is applied to an address from a base register, the result is used to perform memory access and written back to the base register. It looks like `[rN, offset]!`
 The exclamation mark “!” implies adding the offset after the load/store.
-```arm
+```asm
 // load a byte from x1 plus 1, then advance x1 by 1
 ldrb   w0, [x1, 1]!
 
@@ -319,7 +319,7 @@ ldr    x0, [x1, 8]!
 #### Post-indexed addressing 
 An address is used as-is from a base register for memory access. The offset is applied and the result is stored back to the base register. It looks like `[rN], offset`
 This mode accesses the value first and then adds the offset to base.
-```arm
+```asm
   // load a byte from x1, then advance x1 by 1
   ldrb   w0, [x1], 1
 
@@ -334,7 +334,7 @@ This mode accesses the value first and then adds the offset to base.
 ```
 ### Saving Registers
 19 registers are free to use without having to preserve them for the caller. Compare to x86 where only 3 registers are available or 5 on AMD64. ARM stores the return address in the Link Register (LR) which is an alias for X30 register. A callee is expected to save LR/X30 if it calls a subroutine
-```arm
+```asm
     @ push {x0}
     @ [base - 16] = x0
     @ base = base - 16
@@ -359,7 +359,7 @@ The 16 in stp x29, x30, [sp, #-16]! is about stack space:
 - push and pop instructions have been deprecated in favour of load and store, use STR/STP to save and LDR/LDP to store. Here’s how you can save/restore registers using the stack
 
 ### Copying Registers
-```arm
+```asm
     @ Move x1 to x0
     mov     x0, x1
 
@@ -380,7 +380,7 @@ The 16 in stp x29, x30, [sp, #-16]! is about stack space:
 ```
 ###  Init register to zero
 Initialize a counter “i = 0” or pass NULL/0 to a system call like so
-```arm
+```asm
     @ Move an immediate value of zero into the register.
     mov    x0, 0
 
@@ -414,7 +414,7 @@ Initialize a counter “i = 0” or pass NULL/0 to a system call like so
 ```
 ### Init register to 1.
 Rarely starts a counter at 1, but it’s common enough
-```arm
+```asm
     @ Move 1 into x0.
     mov     x0, 1
 
@@ -428,7 +428,7 @@ Rarely starts a counter at 1, but it’s common enough
 ```
 ### Init register to -1.
 Some sys calls require this
-```arm
+```asm
     @ move -1 into register
     mov     x0, -1
 
@@ -451,7 +451,7 @@ Some sys calls require this
 ```
 ### Init register to 0x80000000.
 might seem vague, but crypto/X25519 uses this value for reduction step
-```arm
+```asm
     mov     w0, 0x80000000
 
     @ Set bit 31 of w0.
@@ -477,7 +477,7 @@ might seem vague, but crypto/X25519 uses this value for reduction step
 ```
 ### Check for 1/TRUE.
 some ways to test for equality
-```arm
+```asm
     @ Compare x0 with 1, branch if equal.
     cmp     x0, 1
     beq     true
@@ -502,7 +502,7 @@ some ways to test for equality
 ```
 
 ### Check for 0/FALSE.
-```arm
+```asm
     @ x0 == 0
     cmp     x0, 0
     beq     false
@@ -534,7 +534,7 @@ some ways to test for equality
 ```
 ### Check for -1
 Some functions will return a negative number like -1 to indicate failure. CMN is used in the first example. This behaves exactly like CMP, except it is adding the source value (register or immediate) to the destination register, setting the flags and discarding the result.
-```arm
+```asm
     @ w0 == -1
     cmn     w0, 1
     beq     failed
@@ -554,7 +554,7 @@ Some functions will return a negative number like -1 to indicate failure. CMN is
     @ w0 & 0x80000000
     tbz     w0, 31, failed
 ```
-```arm
+```asm
 // Save registers (using stack rather than SIMD since ARM64 has plenty of GP registers)
 stp x29, x30, [sp, #-16]!    // Save frame pointer and link register
 stp x19, x20, [sp, #-16]!    // Save callee-saved registers

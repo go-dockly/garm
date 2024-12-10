@@ -16,7 +16,7 @@ The principle of "minimize memory operands" is very important in ARM64
 4. Consider instruction latency and throughput
 5. Avoid data dependencies when possible for better pipelining
 
-```arm
+```asm
 // Bad (memory heavy)
 str w0, [x1]        // Store to memory
 ldr w0, [x1]        // Load right back
@@ -44,7 +44,7 @@ stp x2, x3, [x0], #16     // Store pair and update pointer
 
 ## Register Preservation
 
-```arm
+```asm
 // Save registers (using stack rather than SIMD since ARM64 has plenty of GP registers)
 stp x29, x30, [sp, #-16]!    // Save frame pointer and link register
 stp x19, x20, [sp, #-16]!    // Save callee-saved registers
@@ -62,35 +62,35 @@ ldp x29, x30, [sp], #16
 ret
 ```
 
-Use paired instructions
+### Use paired instructions
 
-```arm
+```asm
 // Better than single loads/stores
 ldp x1, x2, [x0]      // Load pair
 stp x1, x2, [x0]      // Store pair
 ```
 
-Take advantage of zero register initialisation
+### Take advantage of zero register initialisation
 
-```arm
+```asm
 // xzr is always zero
 add x0, x1, xzr       // Move register (clearer than mov)
 ```
-Use post-index and pre-index addressing
+### Use post-index and pre-index addressing
 
-```arm
+```asm
 ldr x0, [x1], #8      // Load and increment
 ldr x0, [x1, #8]!     // Increment and load
 ```
-Consider NEON/SIMD instructions for data-parallel operations
+### Consider NEON/SIMD instructions for data-parallel operations
 
-```arm
+```asm
 ld1 {v0.4s}, [x0]     // Load 4 32-bit values
 add v1.4s, v0.4s, v0.4s // Parallel add
 ```
 
-Rotating in ARM64
-```arm
+### Rotating in ARM64
+```asm
 // Prefer fixed immediate rotates
 ror w0, w0, #1        // Good: fixed immediate
 ror w0, w0, w1        // Less efficient: variable rotate
@@ -101,8 +101,8 @@ ror     x0, x0, #8     // Rotate right by 8 bits
 ```
 Note: Left rotation can be achieved with ROR using (32/64 - n)
 
-Utilize Flags
-```arm
+### Utilize Flags
+```asm
 // Less efficient
 sub w0, w0, #1        // Decrement
 cmp w0, #0            // Unnecessary compare
@@ -113,8 +113,8 @@ subs w0, w0, #1       // Decrement and set flags
 b.ne loop             // Branch using flags from subs
 ```
 
-Multiply Instead of Divide
-```arm
+### Multiply Instead of Divide
+```asm
 // For power-of-2 divisions, use shift
 lsr w0, w0, #3        // Divide by 8
 
@@ -128,7 +128,7 @@ lsr  w0, w0, #1       // Result in w0
 Zero/Sign Extension in ARM64
 ARM64 has dedicated instructions:
 
-```arm
+```asm
 // Zero extend
 uxtb w0, w0           // Byte to word
 uxth w0, w0           // Halfword to word
@@ -138,18 +138,18 @@ sxtb w0, w0           // Byte to word
 sxth w0, w0           // Halfword to word
 ```
 
-Zeroing Registers in ARM64
+### Zeroing Registers in ARM64
 
-```arm
+```asm
 // Best way to zero a register
 mov w0, wzr           // Using zero register
 // or
 eor w0, w0, w0        // Using XOR (might be useful in specific cases)
 ```
 
-Unsigned Division in ARM64
+### Unsigned Division in ARM64
 
-```arm
+```asm
 // Signed division
 sdiv w0, w0, w1
 
@@ -157,9 +157,9 @@ sdiv w0, w0, w1
 udiv w0, w0, w1
 ```
 
-Avoiding Dependencies in ARM64
+### Avoiding Dependencies in ARM64
 
-```arm
+```asm
 // Poor scheduling (dependency)
 add w0, w0, #1
 add w1, w1, #1
@@ -172,39 +172,39 @@ add w1, w1, #1
 cmp w0, w2            // Dependencies better distributed
 ```
 
-Use Combined Operations
+### Use Combined Operations
 
-```arm
+```asm
 // Add/subtract with shift
 add w0, w1, w2, lsl #2    // w0 = w1 + (w2 << 2)
 ```
 
-Take Advantage of Conditional Instructions
+### Take Advantage of Conditional Instructions
 
-```arm
+```asm
 cmp w0, #0
 csel w0, w1, w2, eq       // w0 = (w0 == 0) ? w1 : w2
 ```
 
-Use Post/Pre-Index for Efficient Memory Access
+### Use Post/Pre-Index for Efficient Memory Access
 
-```arm
+```asm
 ldr w0, [x1], #4          // Load and increment
 ldr w0, [x1, #4]!         // Increment and load
 ```
 
-Utilize Compare and Branch Instructions
+### Utilize Compare and Branch Instructions
 
-```arm
+```asm
 cbz w0, label             // Compare and branch if zero
 cbnz w0, label            // Compare and branch if not zero
 ```
 
 The famous LEA (Load Effective Address) optimization from x86. In ARM64, while we don't have an exact equivalent of LEA, we have several ways to achieve similar optimizations:
 
-Combined Arithmetic Operations in ARM64
+### Combined Arithmetic Operations in ARM64
 
-```arm
+```asm
 // ARM64 offers combined add/shift operations:
 add x1, x2, x2, lsl #2    // x1 = x2 + (x2 << 2)  // Similar to LEA [reg*4]
 add x1, x2, x2, lsl #1    // x1 = x2 + (x2 << 1)  // Similar to LEA [reg*3]
@@ -217,10 +217,10 @@ loop:
     b.ne loop              // Branch if not zero
 ```
 
-Flag-Independent Operations
+### Flag-Independent Operations
 ARM64 has explicit flag-setting versions of instructions, so you can control when flags are affected:
 
-```arm
+```asm
 // Regular add (doesn't affect flags)
 add w0, w0, w1
 
@@ -233,9 +233,9 @@ add  w1, w2, w2, lsl #2   // Doesn't affect flags
 b.ne loop                 // Uses flags from subs
 ```
 
-More Complex Address Calculations
-```arm
-// ARM64 can do some complex addressing in one instruction:
+### More Complex Address Calculations
+ARM64 can do some complex addressing in one instruction:
+```asm
 add x0, x1, x2, lsl #3    // x0 = x1 + (x2 << 3)
 add x0, x1, x2, lsr #2    // x0 = x1 + (x2 >> 2)
 
@@ -243,10 +243,10 @@ add x0, x1, x2, lsr #2    // x0 = x1 + (x2 >> 2)
 add x0, x1, w2, sxtw #2   // Sign-extend w2 to 64 bits, shift left by 2, then add
 ```
 
-Alternative Optimizations
+### Alternative Optimizations
 
-```arm
-// ARM64 offers other efficient ways to do math:
+ARM64 offers other efficient ways to do math:
+```asm
 madd w0, w1, w2, w3      // w0 = w1 * w2 + w3
 msub w0, w1, w2, w3      // w0 = w1 * w2 - w3
 
@@ -266,15 +266,12 @@ Key differences from x86's LEA:
 - Explicit flag control
 - Rich set of combined arithmetic operations
 
-I'll help translate this x86 optimization concept to ARM64 (AArch64). 
-
 ## Built-in byte swap instructions:
-
-- We have several options for handling byte swapping and bit manipulation analogous to x86's BSWAP, ROL, and ROR
+There are several options for handling byte swapping and bit manipulation analogous to x86's BSWAP, ROL, and ROR
 1. REV - Reverse bytes across entire register
 2. REV16 - Reverse bytes in each halfword
 3. REV32 - Reverse bytes in each word
-```arm
+```asm
 // Cool trick to switch from Big Endian to Little Endian, using REV instruction:
     mov     w0, #0          // Clear the 32-bit register
     movz    w0, #234        // Set lower 16 bits to 234
@@ -303,53 +300,59 @@ Note:
 - UBFX/SBFX (Bit Field Extract)
 - CLZ (Count Leading Zeros) for zero-byte detection
 
-1. **Better Native Support**: Unlike x86, ARM64 has dedicated byte-reverse instructions (`REV`, `REV16`, `REV32`) that are generally more efficient than the x86 `BSWAP`.
+#### **Better Native Support**: Unlike x86, ARM64 has dedicated byte-reverse instructions (`REV`, `REV16`, `REV32`) that are generally more efficient than the x86 `BSWAP`.
 
-3. **Better Bit Manipulation**: Instead of using rotates for packing, ARM64 offers:
+#### **Better Bit Manipulation**: Instead of using rotates for packing, ARM64 offers:
    - `BFI` (Bit Field Insert)
    - `UBFX`/`SBFX` (Bit Field Extract)
    - `MOVK` for moving 16-bit immediates to specific halfwords
 
-4. **Performance Characteristics**: Unlike the P4 where rotates were faster than `BSWAP`, in modern ARM64:
+#### **Performance Characteristics**: Unlike the P4 where rotates were faster than `BSWAP`, in modern ARM64:
    - `REV` instructions are highly optimized
-   - Bit field instructions often provide better alternatives
-   - SIMD operations can parallelize many of these operations
+   - Bit field instructions often provide better alternative
+   - SIMD operations can parallelize many of these ops
 
 ### Zero-extension 
 is handled differently than x86. Several instructions have zero-extension built in:
-```arm
-// 1. LDRB (Load Register Byte) with zero-extension
+1. LDRB (Load Register Byte) with zero-extension
+```asm
 zero_extend_byte:
     // This automatically zero-extends to 32 bits
     ldrb    w0, [x1]        // Load byte and zero-extend to 32 bits
     // w0 now contains the zero-extended value, no extra instructions needed
-
-// 2. LDRH (Load Register Halfword) with zero-extension
+```
+2. LDRH (Load Register Halfword) with zero-extension
+```asm
 zero_extend_halfword:
     // This automatically zero-extends to 32 bits
     ldrh    w0, [x1]        // Load halfword and zero-extend to 32 bits
-    
-// 3. Using dedicated zero-extend instructions
+```
+3. Using dedicated zero-extend instructions
+```asm
 explicit_zero_extend:
     // UXTB - Extract unsigned byte
     uxtb    w0, w1          // Zero-extend byte to 32 bits
     // UXTH - Extract unsigned halfword
     uxth    w0, w1          // Zero-extend halfword to 32 bits
-
-// 4. Working with 64-bit registers
+```
+4. Working with 64-bit registers
+```asm
 zero_extend_to_64:
     // When loading to X registers, use zero-extending variants
     ldrb    x0, [x1]        // Zero-extends to full 64 bits
     
     // Or use explicit extension
     uxtb    x0, x1          // Zero-extend byte to 64 bits
-    
-// 5. Efficient handling of immediate values
+```
+
+5. Efficient handling of immediate values
+```asm
 load_small_immediate:
     // MOVZ automatically zero-extends
     movz    w0, #123        // Loads 123, upper bits are zeroed
-    
-// 6. Combining operations
+```
+6. Combining operations
+```asm
 combine_operations:
     // Load byte and add in one sequence
     ldrb    w0, [x1]        // Load and zero-extend
@@ -358,14 +361,16 @@ combine_operations:
     // Or with halfword
     ldrh    w0, [x1]        // Load and zero-extend
     add     w0, w0, #1      // Add to zero-extended value
-
-// 7. Bitfield operations (alternative approach)
+```
+7. Bitfield operations (alternative approach)
+```asm
 bitfield_zero_extend:
     // Using UBFX (Unsigned Bit Field Extract)
     ubfx    w0, w1, #0, #8  // Extract and zero-extend 8 bits
     ubfx    w0, w1, #0, #16 // Extract and zero-extend 16 bits
-
-// 8. Working with arrays/buffers
+```
+8. Working with arrays/buffers
+```asm
 process_byte_array:
     // Process multiple bytes efficiently
 .loop:
@@ -375,7 +380,7 @@ process_byte_array:
     subs    x2, x2, #1      // Decrement counter
     b.ne    .loop           // Continue if not done
 ```
-Automatic Zero Extension:
+### Automatic Zero Extension:
 
 - ARM64 load instructions (LDRB, LDRH) automatically zero-extend when loading to W registers
 - No need for separate zero-extension operations in many cases like using W registers (32-bit), upper 32 bits of X register are automatically zeroed
@@ -402,33 +407,31 @@ Original C code
         unsigned char c = (the_array[i])>>16) & 0xFF;
         unsigned char c = (the_array[i])>>24) & 0xFF;
 ```
-ARM64 equivalent
-```arm
-// Less optimal version using shifts and masks:
+Less optimal version using shifts and masks:
+```asm
 original_version:
     ldr     w0, [x1]            // Load the dword
     lsr     w0, w0, #16         // Shift right by 16
     and     w0, w0, #0xFF       // Mask to get byte
 ```
 Better approaches:
-
 1. Using byte-aligned loads
-```arm 
-// Most efficient - direct byte access:
+Most efficient - direct byte access:
+```asm 
 efficient_version:
     ldrb    w0, [x1, #2]        // Directly load third byte
     // No additional instructions needed!
 ```
 2. Using UBFX (Unsigned Bit Field Extract)
-```arm
-// Alternative when value is already in register:
+Alternative when value is already in register:
+```asm
 bitfield_version:
     ldr     w0, [x1]            // Load the dword
     ubfx    w0, w0, #16, #8     // Extract bits 16-23
 ```
 3. Unrolled version for all 4 bytes
-```arm
-// Most efficient approach when needing all bytes:
+Most efficient approach when needing all bytes:
+```asm
 unrolled_version:
     ldr     w0, [x1]            // Load the dword once
     // Then either:
@@ -455,9 +458,9 @@ unrolled_version:
     // No AND needed for byte 3 as upper bits are already 0
 ```
 4. SIMD approach for processing multiple dwords
-```arm
+```asm
 simd_version:
-    ld1     {v0.4s}, [x1]       // Load 4 dwords
+    ld1     {v0.4s}, [x1]           // Load 4 dwords
     uzp1    v1.16b, v0.16b, v0.16b  // Unzip bytes
     // Now v1 contains all bytes unpacked
 ```

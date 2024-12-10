@@ -3,7 +3,7 @@ ARM64 doesn't have dedicated string instructions like x86's SCAS/CMPS/STOS
 Instead, we can use:
 1. Load/Store with post-increment
 2. SIMD operations for bulk processing
-```arm
+```asm
 strlen:
     mov     x2, x0                  // Save start address
     // Check alignment
@@ -39,7 +39,7 @@ strlen:
 
 ### SIMD String Operations Example
 Process 16 bytes at once for string operations
-```arm
+```asm
 .align 4
 simd_strlen:
     dup     v0.16b, wzr            // Zero vector for comparison
