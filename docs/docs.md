@@ -212,10 +212,31 @@ ast.BasicLit
 
 [NEXT -> Concrete example adding two slices](int32.md)
 
+## ARM64 assembly macros that implement key Go runtime features
+
+Goroutine Support:
+
+- GO_STACK_INIT: Allocates stack space with guard pages
+- GO_START: Creates and starts a new goroutine with proper stack and state initialization
+
+Channel Operations:
+
+- CHAN_INIT: Creates a new channel with specified buffer size
+- CHAN_SEND: Non-blocking and blocking channel send operations
+- CHAN_RECV: Non-blocking and blocking channel receive operations
+
+Core standard library:
+
+- DEFER: Implements Go's defer mechanism using a linked list of deferred functions
+- SELECT: Basic SELECT implementation for channel operations supporting multiple cases with timeout
+- PANIC: Implements panic with proper defer chain unwinding
+- RECOVER: TODO needs expansion
+
 <div align="center">
   <img src="img/argo-mascot.jpg" alt="Logo">
 </div>
 <p align="center">
     <img src="https://raw.githubusercontent.com/bornmay/bornmay/Update/svg/Bottom.svg" alt="Github Stats" />
 </p>
+<p align="right">(<a href="../readme.md">go back</a>)</p>
 <p align="right">(<a href="#top">back to top</a>)</p>

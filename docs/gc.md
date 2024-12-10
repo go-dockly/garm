@@ -29,7 +29,7 @@
 
 ## `૮₍ • ᴥ • ₎ა gARM彡` WIP coming soon
 
-### Generational Garbage Collection (default)
+### [Generational Garbage Collection](../pkg/asm/gen_gc_test.asm)
 
 Call `init_gen_gc` at program start
 This sets up three generation spaces:

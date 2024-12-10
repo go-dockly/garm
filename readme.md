@@ -13,7 +13,7 @@ We love our gopher more than anything it's always been a loyal companion protect
 
 𒇫 [ARM assembly 101/](docs/asm/0_intro.md)
 
-𒇫 [docs/](docs/docs.md)
+𒇫 [Docs/](docs/docs.md)
 
 𒇫 [Links/](docs/links.md)
 
@@ -26,32 +26,27 @@ While there are many Go compilers and ARM assemblers, there's a gap in the marke
 - NEON SIMD operations for vectorization
 - Hardware divide and multiply-accumulate instructions
 
-### Engineering Merit
-
-- Go's AST parsing ensures robust handling of syntax
-- intermediate representation (IR) allows for platform-independent optimizations
-- maintainable code base (AST), (IRNodeMapper), (Optimizer), (AssemblyGenerator)
-- gARM彡 by default compiles with Generational GC 
-
 ### Market Timing 
 
 With the rising dominance of ARM architecture (Apple M-series, AWS Graviton, mobile devices, embedded systems), having tools that can optimize specifically for ARM64 is becoming increasingly important.
 
+### Engineering
+
+- (AST) -> (SSA) -> (IR) -> (Optimizer) -> (Assembly)
+
 ## `ദ്ദി(˵•̀ᴗ -˵)ᕤ` Road map
 
+- gARM彡 by default compiles with Generational GC
 - Offer choice between [GC algoritms](docs/gc.md) or none
 - High-performance computing on ARM servers (5x go performance on ARM64)
 - Cross platform mobile / embedded systems where performance is critical
-- cloud applications running on ARM instances
-
+- Cloud applications running on ARM instances
 
 ## Performance `(๑•̀ᗝ•́)૭` 
 
 𒇫 todo 
 
 ## Contribute `ദ്ദി(༎ຶ‿༎ຶ)` 
-
-𒇫 todo 
 
 <p align="center">
         <img src="https://raw.githubusercontent.com/bornmay/bornmay/Update/svg/Bottom.svg" alt="Github Stats" />
