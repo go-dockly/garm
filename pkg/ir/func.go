@@ -19,7 +19,7 @@ type Function struct {
 	Blocks           []Instruction
 	Returns          map[string]alloc.Location
 	dbg              *dbg.Debugger
-	Frames           *FrameManager
+	// Frames           *FrameManager
 }
 
 func NewFunction(label string, debug *dbg.Debugger) *Function {
@@ -31,7 +31,7 @@ func NewFunction(label string, debug *dbg.Debugger) *Function {
 		Globals: make(map[string]alloc.Location),
 		Blocks:  make([]Instruction, 0),
 		dbg:     debug,
-		Frames:  NewFrameManager(),
+		// Frames:  NewFrameManager(),
 	}
 }
 

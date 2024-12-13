@@ -5,8 +5,6 @@ import (
 
 	"github.com/algoboyz/garm/pkg/alloc"
 	"github.com/algoboyz/garm/pkg/ir"
-	"github.com/algoboyz/garm/pkg/reg"
-	"github.com/davecgh/go-spew/spew"
 	"golang.org/x/tools/go/ssa"
 )
 
@@ -87,40 +85,45 @@ func (m *SSAMapper) processParams(params []*ssa.Parameter) (map[string]alloc.Loc
 // }
 
 func (m *SSAMapper) prologue() (instructions []ir.Instruction) {
-	// if m.currentIR.Label == "main" {
-	// 	instructions = ir.PrologueMain()
-	// } else {
-	// 	instructions = ir.FuncPrologue(m.currentIR.Label)
-	// }
-	// Create a new frame
-	frame := m.currentIR.Frames.PushFrame(true) // true means we need a frame pointer
-
-	// Save some registers
-	offset, _ := m.currentIR.Frames.SaveRegister(reg.LR)
-	fmt.Printf("LR saved at sp+%d\n", offset)
-
-	// Allocate local variables
-	localOffset, _ := m.currentIR.Frames.AllocateStackSlot(8, 8) // 8-byte variable, 8-byte aligned
-
-	spew.Dump(frame)
-	spew.Dump(localOffset)
-
-	// Generate prologue
-	instructions = m.currentIR.Frames.GenerateFrameSetup()
-	for _, inst := range instructions {
-		fmt.Println(inst)
+	if m.currentIR.Label == "main" {
+		instructions = ir.PrologueMain()
+	} else {
+		instructions = ir.FuncPrologue(m.currentIR.Label)
 	}
+	// Create a new frame
+	// frame := m.currentIR.Frames.PushFrame(true) // true means we need a frame pointer
+
+	// // Save some registers
+	// offset, _ := m.currentIR.Frames.SaveRegister(reg.LR)
+	// fmt.Printf("LR saved at sp+%d\n", offset)
+
+	// // Allocate local variables
+	// localOffset, _ := m.currentIR.Frames.AllocateStackSlot(8, 8) // 8-byte variable, 8-byte aligned
+
+	// spew.Dump(frame)
+	// spew.Dump(localOffset)
+
+	// // Generate prologue
+	// instructions = m.currentIR.Frames.GenerateFrameSetup()
+	// for _, inst := range instructions {
+	// 	fmt.Println(inst)
+	// }
 
 	return instructions
 }
 
 func (m *SSAMapper) epilogue() (instructions []ir.Instruction) {
 	// Generate epilogue
-	instructions = m.currentIR.Frames.GenerateFrameTeardown()
-	for _, inst := range instructions {
-		fmt.Println(inst)
+	if m.currentIR.Label == "main" {
+		instructions = ir.EpilogueMain()
+	} else {
+		instructions = ir.FuncEpilogue()
 	}
-	// Clean up
-	m.currentIR.Frames.PopFrame()
+	// instructions = m.currentIR.Frames.GenerateFrameTeardown()
+	// for _, inst := range instructions {
+	// 	fmt.Println(inst)
+	// }
+	// // Clean up
+	// m.currentIR.Frames.PopFrame()
 	return instructions
 }

@@ -28,7 +28,7 @@ func FuncEpilogue() (instructions []Instruction) {
 	return append(instructions, Instruction{
 		Op: op.LDP,
 		Dst: &reg.Register{
-			ID:    19,
+			ID:    29,
 			Class: reg.RegisterClassGPR,
 		},
 		Src: []reg.Operand{
@@ -73,7 +73,7 @@ func EpilogueMain() (instructions []Instruction) {
 	return append(instructions, Instruction{
 		Op: op.LDP,
 		Dst: &reg.Register{
-			ID:    19,
+			ID:    29,
 			Class: reg.RegisterClassGPR,
 		},
 		Src: []reg.Operand{
